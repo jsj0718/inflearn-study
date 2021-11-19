@@ -4,14 +4,10 @@ import hello.core.AppConfig;
 import hello.core.member.Grade;
 import hello.core.member.Member;
 import hello.core.member.MemberService;
-import hello.core.member.MemberServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class OrderServiceTest {
-
-//    MemberService memberService = new MemberServiceImpl();
-//    OrderService orderService = new OrderServiceImpl();
 
     MemberService memberService;
     OrderService orderService;
@@ -37,4 +33,11 @@ class OrderServiceTest {
         org.assertj.core.api.Assertions.assertThat(order.getDiscountPrice()).isEqualTo(1000);
     }
 
+//    @Test
+//    @DisplayName("필드 주입은 순수한 자바코드로 테스트를 할 때 할 수 있는 방법이 없다.")
+//    void findInjectionTest() {
+//        OrderServiceImpl orderService = new OrderServiceImpl();
+//        Assertions.assertThrows(NullPointerException.class,
+//                () -> orderService.createOrder(1L, "슬램덩크", 10000));
+//    }
 }
