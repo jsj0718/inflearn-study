@@ -9,7 +9,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SingletonTest {
+class SingletonTestTest {
 
     @Test
     @DisplayName("스프링이 없는 순수한 DI 컨테이너")
