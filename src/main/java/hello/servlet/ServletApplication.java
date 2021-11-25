@@ -12,4 +12,15 @@ public class ServletApplication {
 		SpringApplication.run(ServletApplication.class, args);
 	}
 
+	// application.properties에서 설정한 값을 토대로 Spring Boot가 자동으로 Bean을 생성해준다.
+//	@Bean
+//	ViewResolver internalResourceViewResolver() {
+//		return new InternalResourceViewResolver("/WEB-INF/views", ".jsp");
+//	}
+
+	// Annotation을 쓰지 않고 Bean으로 등록하여 사용할 수도 있다. (단, controller에는 @RequestMapping을 써야함)
+//	@Bean
+//	SpringMemberFormControllerV1 springMemberFormControllerV1() {
+//		return new SpringMemberFormControllerV1();
+//	}
 }
