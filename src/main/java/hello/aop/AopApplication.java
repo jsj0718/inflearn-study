@@ -1,9 +1,7 @@
 package hello.aop;
 
-import hello.aop.order.aop.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 //@Import(AspectV1.class)
