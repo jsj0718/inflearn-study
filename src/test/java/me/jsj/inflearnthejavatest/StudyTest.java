@@ -3,7 +3,9 @@ package me.jsj.inflearnthejavatest;
 import jdk.jfr.Enabled;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.AggregateWith;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
@@ -27,10 +29,15 @@ import static org.junit.jupiter.api.Assumptions.assumingThat;
  * 1. 테스트 이름 표기 방법 설정 (e.x _를 생략 가능)
  * 2. 클래스, 메서드에 적용 가능하며 클래스에 적용하면 모든 메서드에 적용된다.
  */
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+//@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+//@ExtendWith(FindSlowTestExtension.class) //확장 방법 1. 선언적 등록 (커스터마이징 불가능)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) //@Order으로 순서 지정 가능 (JUnit5)
 class StudyTest {
+
+    //확장 방법 2. 프로그래밍 등록 (생성자를 통해 원하는 기준값 설정 가능)
+    @RegisterExtension
+    static FindSlowTestExtension findSlowTestExtension = new FindSlowTestExtension(2000L);
 
     //모든 테스트 실행 이전 딱 1번 실행
     @BeforeAll
@@ -132,6 +139,7 @@ class StudyTest {
 
     @Test
     @EnabledOnOs(OS.WINDOWS)
+    @Disabled
     void windowConditionTest() {
         System.out.println("window os 환경에서 Test");
     }
@@ -230,10 +238,11 @@ class StudyTest {
         System.out.println(value++);
     }
 
-    @SlowTest
+    @Test
     @Order(2)
-    void test2() {
+    void test2() throws InterruptedException {
         System.out.println(this);
         System.out.println(value++);
+        Thread.sleep(1005);
     }
 }
