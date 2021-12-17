@@ -1,9 +1,9 @@
 package me.jsj.inflearnthejavatest;
 
-import jdk.jfr.Enabled;
+import me.jsj.inflearnthejavatest.domain.Study;
+import me.jsj.inflearnthejavatest.domain.StudyStatus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,14 +14,14 @@ import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Duration;
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 /**
@@ -88,7 +88,7 @@ class StudyTest {
                 () -> assertNotNull(study),
                 () -> assertEquals(StudyStatus.DRAFT, study.getStatus(), () -> "스터디를 처음 만들면 DRAFT 상태다."),
                 () -> assertTrue(1 < 2),
-                () -> assertTrue(study.getLimit() > 0, () -> "스터디 최대 참석 인원은 0보다 커야 한다.")
+                () -> assertTrue(study.getLimitCount() > 0, () -> "스터디 최대 참석 인원은 0보다 커야 한다.")
         );
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Study(-10));
@@ -102,7 +102,7 @@ class StudyTest {
         });
 
         //assertJ 사용 예시
-        assertThat(new Study(10).getLimit()).isGreaterThan(0);
+        assertThat(new Study(10).getLimitCount()).isGreaterThan(0);
     }
 
     @Test
@@ -122,12 +122,12 @@ class StudyTest {
         //조건에 따라 어떤 테스트를 진행할 지 정할 수 있다.
         assumingThat("LOCAL".equalsIgnoreCase(test_env), () -> {
             Study study = new Study(100);
-            assertThat(study.getLimit()).isGreaterThan(0);
+            assertThat(study.getLimitCount()).isGreaterThan(0);
         });
 
         assumingThat("jsj".equalsIgnoreCase(test_env), () -> {
             Study study = new Study(10);
-            assertThat(study.getLimit()).isGreaterThan(0);
+            assertThat(study.getLimitCount()).isGreaterThan(0);
         });
     }
 
@@ -192,7 +192,7 @@ class StudyTest {
     @ParameterizedTest(name = "{index} {displayName}, message={0} ")
     @ValueSource(ints = {10, 20, 30})
     void parameterConvertTest(@ConvertWith(StudyConverter.class) Study study) {
-        System.out.println(study.getLimit());
+        System.out.println(study.getLimitCount());
     }
 
     @ParameterizedTest(name = "{index} {displayName}, message={0} ")
