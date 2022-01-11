@@ -4,7 +4,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -52,15 +51,62 @@ public class JpaMain {
 /*
             //비영속 상태
             Member member = new Member();
-            member.setId(100L);
+            member.setId(101L);
             member.setName("HelloJPA");
 
             //영속 상태
             System.out.println("=== BEFORE ===");
             em.persist(member);
             System.out.println("=== AFTER ===");
+
+            //1차 캐시에 저장된 경우 DB에 쿼리를 날리지 않는다.
+            Member findMember = em.find(Member.class, 101L);
+            System.out.println("findMember.getId() = " + findMember.getId());
+            System.out.println("findMember.getName() = " + findMember.getName());
 */
 
+/*
+            //처음 조회 시 DB에서 가져오면서 1차 캐시에 등록되고, 그 다음 조회는 1차 캐시에서 가져온다. (동일성 보장)
+            Member findMember1 = em.find(Member.class, 101L);
+            Member findMember2 = em.find(Member.class, 101L);
+            System.out.println("result = " + (findMember1 == findMember2));
+*/
+
+/*
+            //SQL 쿼리는 쓰기 지연 기능으로 인해 커밋 시에 한 번에 날라간다.
+            Member member1 = new Member(150L, "A");
+            Member member2 = new Member(160L, "B");
+
+            em.persist(member1);
+            em.persist(member2);
+            System.out.println("================");
+*/
+
+/*
+            //영속성 컨테이너는 변화를 감지하여 자동으로 DB에 반영한다.
+            Member findMember = em.find(Member.class, 150L);
+            findMember.setName("AAA");
+*/
+
+/*
+            //미리 데이터베이스에 반영하거나 쿼리를 보고싶은 경우 flush()를 강제로 호출하면 된다.
+            Member member = new Member(201L, "Flush Test");
+            em.persist(member);
+
+            em.flush();
+            System.out.println("=====================");
+*/
+            
+/*
+            //준영속 상태 (변경사항 수정 X)
+            Member member = em.find(Member.class, 150L);
+            member.setName("ZZZZZ");
+            
+//            em.detach(member); //특정 엔티티만 준영속 상태로 만듦
+            em.clear(); //영속 컨테이너 모두 초기화
+
+            Member member2 = em.find(Member.class, 150L); //영속 컨테이너가 초기화되어 다시 select로 db에서 조회
+*/
 
             tx.commit(); //성공 시 커밋
         } catch (Exception e) {

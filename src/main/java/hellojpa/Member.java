@@ -15,6 +15,14 @@ public class Member {
 //    @Column(name = "username") //username 컬럼으로 쿼리가 작성된다.
     private String name;
 
+    public Member() {
+    }
+
+    public Member(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
