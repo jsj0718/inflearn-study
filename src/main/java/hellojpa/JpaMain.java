@@ -1,5 +1,7 @@
 package hellojpa;
 
+import org.h2.engine.User;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -107,6 +109,33 @@ public class JpaMain {
 
             Member member2 = em.find(Member.class, 150L); //영속 컨테이너가 초기화되어 다시 select로 db에서 조회
 */
+
+/*
+            //@Enumerated에서 value Test (EnumType.String으로 지정해야 하는 이유)
+            Member member = new Member();
+            member.setId(1L);
+            member.setUsername("정대만");
+            member.setRoleType(RoleType.USER);
+            em.persist(member);
+*/
+
+            //IDENTITY 전략에서는 em.persist() 시점에 Query가 실행된다. (PK값을 알지 못하기 때문)
+            //SEQUENCE 전략에서는 em.persist() 시점에 시퀀스 값을 가져와 PK값으로 등록 후 영속성 컨텍스트에 등록된다.
+            Member member1 = new Member();
+            member1.setUsername("member1");
+
+            Member member2 = new Member();
+            member2.setUsername("member1");
+
+            Member member3 = new Member();
+            member3.setUsername("member3");
+
+            //SEQUENCE 전략에서 발생할 수 있는 성능 문제는 allocationSize 속성을 설정하여 개선 가능하다.
+            System.out.println("=========================");
+            em.persist(member1); //1, 51
+            em.persist(member2); //메모리에서 호출
+            em.persist(member3); //메모리에서 호출
+            System.out.println("=========================");
 
             tx.commit(); //성공 시 커밋
         } catch (Exception e) {
