@@ -201,7 +201,9 @@ public class JpaMain {
             team.getUsers().add(user);
             em.persist(team);
 */
-            
+
+/*
+            //다대일
             Team team = new Team();
             team.setName("해남");
             em.persist(team);
@@ -225,6 +227,18 @@ public class JpaMain {
                 System.out.println("u.getName() = " + u.getName());
             }
             System.out.println("=================");
+*/
+
+            User user = new User();
+            user.setName("user1");
+
+            em.persist(user);
+
+            Team team = new Team();
+            team.setName("teamA");
+            team.getUsers().add(user);
+
+            em.persist(team);
 
             tx.commit(); //성공 시 커밋
         } catch (Exception e) {

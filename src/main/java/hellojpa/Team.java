@@ -13,7 +13,11 @@ public class Team {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "team") //
+//    다대일 (주인 X)
+//    @OneToMany(mappedBy = "team")
+//    일대다 (주인 O)
+    @OneToMany
+    @JoinColumn(name = "TEAM_ID")
     private List<User> users = new ArrayList<>(); //관례
 
     public Long getId() {
@@ -40,8 +44,11 @@ public class Team {
         this.users = users;
     }
 
+/*
+    //편의 메서드
     public void addUser(User user) {
         user.setTeam(this);
         users.add(user);
     }
+*/
 }
