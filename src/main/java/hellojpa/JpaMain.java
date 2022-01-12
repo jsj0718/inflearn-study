@@ -1,11 +1,10 @@
 package hellojpa;
 
-import org.h2.engine.User;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -119,6 +118,7 @@ public class JpaMain {
             em.persist(member);
 */
 
+/*
             //IDENTITY 전략에서는 em.persist() 시점에 Query가 실행된다. (PK값을 알지 못하기 때문)
             //SEQUENCE 전략에서는 em.persist() 시점에 시퀀스 값을 가져와 PK값으로 등록 후 영속성 컨텍스트에 등록된다.
             Member member1 = new Member();
@@ -136,6 +136,95 @@ public class JpaMain {
             em.persist(member2); //메모리에서 호출
             em.persist(member3); //메모리에서 호출
             System.out.println("=========================");
+*/
+
+/*
+            //객체를 테이블 데이터 중심 모델링 방식 (협력 관게 X)
+            Team team = new Team();
+            team.setName("북산");
+            em.persist(team);
+
+            User user = new User();
+            user.setName("정대만");
+            user.setTeamId(team.getId());
+            em.persist(user);
+
+            User findUser = em.find(User.class, user.getId());
+            Team findTeam = em.find(Team.class, findUser.getTeamId());
+
+            System.out.println("findUser.getName() = " + findUser.getName());
+            System.out.println("findTeam.getName() = " + findTeam.getName());
+*/
+
+/*
+            //객체지향 모델링 방식
+            Team team = new Team();
+            team.setName("북산");
+            em.persist(team);
+
+            User user = new User();
+            user.setName("정대만");
+            user.setTeam(team);
+            em.persist(user);
+
+            em.flush();
+            em.clear();
+
+            User findUser = em.find(User.class, user.getId());
+            Team findTeam = findUser.getTeam();
+
+            System.out.println("findUser.getName() = " + findUser.getName());
+            System.out.println("findTeam.getName() = " + findTeam.getName());
+
+            //양방향 매핑
+            List<User> users = findUser.getTeam().getUsers();
+
+            for (User u : users) {
+                System.out.println("u.getName() = " + u.getName());
+            }
+*/
+
+/*
+            //연관관계 수정
+            Team newTeam = em.find(Team.class, 100L); //100번 ID를 갖는 팀이 존재할 때
+            findUser.setTeam(newTeam); //새로운 팀으로 수정 가능
+*/
+
+/*
+            //연관관계 주인이 아닌 경우에 데이터 삽입 (삽입되지 않는다.)
+            User user = new User();
+            user.setName("정대만");
+            em.persist(user);
+
+            Team team = new Team();
+            team.setName("북산");
+            team.getUsers().add(user);
+            em.persist(team);
+*/
+            
+            Team team = new Team();
+            team.setName("해남");
+            em.persist(team);
+
+            User user = new User();
+            user.setName("이정환");
+//            user.changeTeam(team);
+            em.persist(user);
+
+            team.addUser(user);
+//            team.getUsers().add(user);
+
+//            em.flush();
+//            em.clear();
+
+            Team findTeam = em.find(Team.class, team.getId());
+            List<User> users = findTeam.getUsers();
+
+            System.out.println("=================");
+            for (User u : users) {
+                System.out.println("u.getName() = " + u.getName());
+            }
+            System.out.println("=================");
 
             tx.commit(); //성공 시 커밋
         } catch (Exception e) {
