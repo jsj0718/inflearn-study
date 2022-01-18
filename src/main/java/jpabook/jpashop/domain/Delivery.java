@@ -2,8 +2,10 @@ package jpabook.jpashop.domain;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.*;
+
 @Entity
-public class Delivery {
+public class Delivery extends BaseEntity{
 
     @Id @GeneratedValue
     @Column(name = "DELIVERY_ID")
@@ -14,6 +16,6 @@ public class Delivery {
     private String zipcode;
     private DeliveryStatus status;
 
-    @OneToOne(mappedBy = "delivery")
+    @OneToOne(mappedBy = "delivery", fetch = LAZY)
     private Order order;
 }
