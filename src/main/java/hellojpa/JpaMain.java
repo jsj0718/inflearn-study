@@ -1,9 +1,8 @@
 package hellojpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
 import java.util.List;
 
 public class JpaMain {
@@ -30,7 +29,7 @@ public class JpaMain {
             Member findMember = em.find(Member.class, 1L);
             findMember.setName("서태웅");
 */
-            
+
             //회원 삭제
 /*
             em.remove(findMember);
@@ -229,24 +228,107 @@ public class JpaMain {
             System.out.println("=================");
 */
 
-            User user = new User();
-            user.setName("user1");
+/*
+            //instanceof 로 타입 비교 (프록시와 실제 객체를 ==으로 비교하면 false이기 때문)
+            User user1 = new User();
+            user1.setName("hello1");
+            em.persist(user1);
 
+            User user2 = new User();
+            user2.setName("hello2");
+            em.persist(user2);
+
+            em.flush();
+            em.clear();
+
+            User findUser = em.find(User.class, user1.getId());
+            User referenceUser = em.getReference(User.class, user2.getId());
+            logic(findUser, referenceUser);
+*/
+
+/*
+            User user = new User();
+            user.setName("user");
             em.persist(user);
 
-            Team team = new Team();
-            team.setName("teamA");
-            team.getUsers().add(user);
+            em.flush();
+            em.clear();
 
+            User referenceUser = em.getReference(User.class, user.getId());
+            System.out.println("referenceUser.getClass() = " + referenceUser.getClass());
+            //초기화 여부 확인
+            System.out.println("emf.getPersistenceUnitUtil().isLoaded(referenceUser) = " + emf.getPersistenceUnitUtil().isLoaded(referenceUser));
+
+            //프록시 객체가 준영속 상태일 때 초기화하면 오류 발생
+//            em.detach(referenceUser);
+//            em.close();
+//            em.clear();
+            
+//            referenceUser.getName();
+            Hibernate.initialize(referenceUser); //강제 초기화
+            System.out.println("emf.getPersistenceUnitUtil().isLoaded(referenceUser) = " + emf.getPersistenceUnitUtil().isLoaded(referenceUser));
+*/
+
+/*
+            //즉시로딩과 지연로딩
+            Team team = new Team();
+            team.setName("team1");
             em.persist(team);
+
+            User user = new User();
+            user.setName("user1");
+            user.setTeam(team);
+            em.persist(user);
+
+            em.flush();
+            em.clear();
+            
+            //즉시로딩의 문제(N+1)을 fetch join으로 해결
+            List<User> users = em.createQuery("select u from User u join fetch u.team", User.class).getResultList();
+*/
+
+            Child child1 = new Child();
+            Child child2 = new Child();
+
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
+
+            em.persist(parent); //CASCADE 설정 시 parent만 persist해도 child가 자동으로 persist 된다.
+            em.persist(child1);
+            em.persist(child2);
+
+            em.flush();
+            em.clear();
+
+            Parent findParent = em.find(Parent.class, parent.getId());
+//            findParent.getChildren().remove(0); //고아 객체 설정 시 부모 엔티티와 연관관계가 끊어진 자식 엔티티는 자동 삭제
+            em.remove(findParent); //고아 객체 설정 시 부모가 삭제되면 자식들도 자동으로 삭제된다.
 
             tx.commit(); //성공 시 커밋
         } catch (Exception e) {
             tx.rollback(); //실패 시 롤백
+            System.out.println("e = " + e.getMessage());
         } finally {
             em.close();
         }
 
         emf.close();
+    }
+
+    private static void logic(User u1, User u2) {
+        System.out.println("u1 == u2 : " + ((u1 instanceof User) && (u2 instanceof User)));
+    }
+
+    private static void printUser(User user) {
+        System.out.println("user.id = " + user.getId());
+//        System.out.println("user.name = " + user.getName());
+    }
+
+    private static void printUserAndTeam(User user) {
+        System.out.println("user = " + user.getName());
+
+        Team team = user.getTeam();
+        System.out.println("team = " + team.getName());
     }
 }

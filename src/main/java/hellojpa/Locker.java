@@ -11,6 +11,9 @@ public class Locker {
 
     private String name;
 
+
+/*
     @OneToOne(mappedBy = "locker")
     private User user;
+*/
 }

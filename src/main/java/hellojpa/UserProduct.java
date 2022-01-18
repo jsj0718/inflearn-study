@@ -22,5 +22,5 @@ public class UserProduct {
     private int count;
     private int price;
     private LocalDateTime orderDateTime;
-    
+
 }
