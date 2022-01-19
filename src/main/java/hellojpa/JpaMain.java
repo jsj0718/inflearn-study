@@ -3,7 +3,9 @@ package hellojpa;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public class JpaMain {
     public static void main(String[] args) {
@@ -287,6 +289,7 @@ public class JpaMain {
             List<User> users = em.createQuery("select u from User u join fetch u.team", User.class).getResultList();
 */
 
+/*
             Child child1 = new Child();
             Child child2 = new Child();
 
@@ -304,6 +307,54 @@ public class JpaMain {
             Parent findParent = em.find(Parent.class, parent.getId());
 //            findParent.getChildren().remove(0); //고아 객체 설정 시 부모 엔티티와 연관관계가 끊어진 자식 엔티티는 자동 삭제
             em.remove(findParent); //고아 객체 설정 시 부모가 삭제되면 자식들도 자동으로 삭제된다.
+*/
+
+            MemberV3 member = new MemberV3();
+            member.setUsername("member1");
+            member.setHomeAddress(new Address("home city", "home street", "12345"));
+
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("족발");
+            member.getFavoriteFoods().add("피자");
+
+            member.getAddressHistory().add(new AddressEntity("old1", "street", "12340"));
+            member.getAddressHistory().add(new AddressEntity("old2", "street", "12341"));
+
+            em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            System.out.println("=========== START ===========");
+            MemberV3 findMember = em.find(MemberV3.class, member.getId());
+
+/*
+            System.out.println("=========== 지연로딩(주소) ===========");
+            List<Address> addressHistory = findMember.getAddressHistory();
+            for (Address address : addressHistory) {
+                System.out.println("address.getCity() = " + address.getCity());
+                System.out.println("address.getStreet() = " + address.getStreet());
+                System.out.println("address.getZipcode() = " + address.getZipcode());
+            }
+
+            System.out.println("=========== 지연로딩(음식) ===========");
+            Set<String> favoriteFoods = findMember.getFavoriteFoods();
+            for (String favoriteFood : favoriteFoods) {
+                System.out.println("favoriteFood = " + favoriteFood);
+            }
+*/
+            //homeCity -> newCity
+            Address address = findMember.getHomeAddress();
+            findMember.setHomeAddress(new Address("newCity", address.getStreet(), address.getZipcode())); //불변 객체이므로 새로 생성한 객체 주입
+
+            //치킨 -> 한식
+            findMember.getFavoriteFoods().remove("치킨");
+            findMember.getFavoriteFoods().add("한식");
+
+            //old1 -> new1 (remove는 equals로 객체를 찾아내는데, 이 때 동등성으로 찾을 수 있게 오버라이딩을 해줘야 한다.)
+            findMember.getAddressHistory().remove(new AddressEntity("old1", "street", "12340"));
+            findMember.getAddressHistory().add(new AddressEntity("new1", "street", "12340"));
+
 
             tx.commit(); //성공 시 커밋
         } catch (Exception e) {
