@@ -1,8 +1,9 @@
 package jpql;
 
-import org.hibernate.annotations.common.reflection.XMember;
-
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import java.util.List;
 
 public class JpaMain {
@@ -16,26 +17,33 @@ public class JpaMain {
 
         try {
 
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("teamA");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
 
             Member member1 = new Member();
-            member1.setUsername("관리자1");
-            member1.setAge(10);
-            member1.setType(MemberType.ADMIN);
-            member1.changeTeam(team);
+            member1.setUsername("회원1");
+            member1.changeTeam(teamA);
             em.persist(member1);
 
             Member member2 = new Member();
-            member2.setUsername("관리자2");
-            member2.setAge(20);
-            member2.setType(MemberType.ADMIN);
-            member2.changeTeam(team);
+            member2.setUsername("회원2");
+            member2.changeTeam(teamA);
             em.persist(member2);
 
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.changeTeam(teamB);
+            em.persist(member3);
+
+/*
             em.flush();
             em.clear();
+*/
 
 /*
             //타입 쿼리와 논타입 쿼리
@@ -184,13 +192,42 @@ public class JpaMain {
 
             //사용자 정의 함수 사용 (group_concat은 결과를 한 줄로 출력하는 함수)
 //            String query = "select function('group_concat', m.username) from Member m";
-            String query = "select group_concat(m.username) from Member m"; //Hibernate 지원 (inject language or reference)
+//            String query = "select group_concat(m.username) from Member m"; //Hibernate 지원 (inject language or reference)
 
-            List<String> result = em.createQuery(query, String.class)
+            //경로 탐색
+//            String query = "select m.username from Member m"; //상태 필드 (탐색 X)
+//            String query = "select m.team from Member m"; //단일 값 연관 경로 (묵시적 조인, 탐색 O)
+//            String query = "select t.members.size from Team t"; //컬렉션 값 연관 경로 (묵시적 조인, 탐색 X)
+//            String query = "select m.username from Team t join t.members m"; //컬렉션 값 연관 경로 (명시적 조인을 통해 탐색 가능)
+
+            //fetch join
+//            String query = "select m from Member m"; //N + 1 문제 발생 위험 (컬렉션 조회 시 문제점)
+//            String query = "select m from Member m join fetch m.team"; //연관관계를 가진 데이터를 한 번에 조회 (다대일)
+
+            //엔티티 직접 사용
+//            String query = "select m from Member m where m = :member"; //member 기본키로 조회
+//            String query = "select m from Member m where m.team = :team"; //member 외래키로 조회 (@JoinColumn에 설정된 값)
+
+            //Named Query (캐시 기능, 쿼리 검증 기능)
+/*
+            List<Member> result = em.createNamedQuery("Member.findByUsername", Member.class)
+                    .setParameter("username", "회원1")
                     .getResultList();
-            for (String s : result) {
-                System.out.println("s = " + s);
-            }
+*/
+
+            //벌크 연산
+            //flush 자동 호출 (query 발생 시 flush 후에 나가게 된다.)
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate();
+
+            System.out.println("resultCount = " + resultCount);
+
+            em.clear();
+
+            Member findMember = em.find(Member.class, member1.getId());
+
+            //영속성 컨텍스트에 있는 값을 조회 (업데이트 반영 안됨) -> 새로 초기화 또는 미리 벌크연산 진행
+            System.out.println("member1.age = " + findMember.getAge());
 
             tx.commit();
         } catch (Exception e) {
