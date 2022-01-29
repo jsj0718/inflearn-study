@@ -1,5 +1,6 @@
-package jpabook.jpashop;
+package jpabook.jpashop.repository;
 
+import jpabook.jpashop.domain.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,18 +17,19 @@ class MemberRepositoryTest {
     @Test
     @Transactional //테스트 코드인 경우 DB를 롤백
     @Rollback(false) //롤백 하지 않고 커밋 실행
-    void testMember() throws Exception {
+    void testMember() {
         //given
         Member member = new Member();
-        member.setUsername("memberA");
+        member.setName("memberA");
 
         //when
-        Long memberId = memberRepository.save(member);
-        Member findMember = memberRepository.find(memberId);
+        memberRepository.save(member);
+        Long memberId = member.getId();
+        Member findMember = memberRepository.findOne(memberId);
 
         //then
         assertThat(findMember.getId()).isEqualTo(member.getId());
-        assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
+        assertThat(findMember.getName()).isEqualTo(member.getName());
         assertThat(findMember).isEqualTo(member);
     }
 
