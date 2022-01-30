@@ -19,9 +19,12 @@ public class ItemRepository {
     public void save(Item item) {
         if (item.getId() == null) {
             em.persist(item);
-        } else {
-            em.merge(item); //update와 유사
         }
+        /*
+        else {
+            em.merge(item); //update와 유사 -> 최대한 사용 X (변경 감지를 사용)
+        }
+        */
     }
 
     /**

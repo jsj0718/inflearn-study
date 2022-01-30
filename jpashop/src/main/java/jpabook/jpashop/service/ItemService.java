@@ -2,6 +2,7 @@ package jpabook.jpashop.service;
 
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.ItemRepository;
+import jpabook.jpashop.service.dto.UpdateItemDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,18 @@ public class ItemService {
     @Transactional
     public void saveItem(Item item) {
         itemRepository.save(item);
+    }
+
+    /**
+     * 상품 수정 (변경 감지)
+     */
+    @Transactional
+//    public void updateItem(Long itemId, String name, int price, int stockQuantity) {
+    public void updateItem(Long itemId, UpdateItemDto itemDto) {
+        Item findItem = itemRepository.findOne(itemId);
+        findItem.setName(itemDto.getName());
+        findItem.setPrice(itemDto.getPrice());
+        findItem.setStockQuantity(itemDto.getStockQuantity());
     }
 
     /**
