@@ -12,9 +12,10 @@ spring:
       hibernate:
 #        show_sql: true
         format_sql: true
-
+        default_batch_fetch_size: 100
+    open-in-view: false #OSIV 설정 끄기
 
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.type: trace #쿼리 파라미터 추적 가능
+#    org.hibernate.type: trace #쿼리 파라미터 추적 가능

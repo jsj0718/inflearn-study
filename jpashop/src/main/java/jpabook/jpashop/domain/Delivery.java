@@ -1,6 +1,6 @@
 package jpabook.jpashop.domain;
 
-import com.sun.imageio.plugins.common.LZWCompressor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +17,7 @@ public class Delivery {
     private Long id;
 
     @OneToOne(mappedBy = "delivery", fetch = LAZY)
+    @JsonIgnore
     private Order order;
 
     @Embedded
