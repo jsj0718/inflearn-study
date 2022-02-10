@@ -12,7 +12,12 @@ import javax.persistence.*;
         name = "Member.findByUsername",
         query = "select m from Member m where m.username = :username"
 )
-public class Member {
+//EntityGraph의 이름을 지어 간편하게 사용 가능
+@NamedEntityGraph(
+        name = "Member.all",
+        attributeNodes = @NamedAttributeNode("team")
+)
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue
